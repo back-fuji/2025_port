@@ -19,6 +19,14 @@
   animation: fade-up 1s var(--animation-delay, 0s) ease forwards;
 }
 
+.animate-modal-fade-in {
+  animation: modal-fade-in 0.3s ease-out forwards;
+}
+
+.animate-modal-zoom-in {
+  animation: modal-zoom-in 0.3s ease-out forwards;
+}
+
 .animate-marquee {
   animation: marquee var(--duration) infinite linear;
 }
@@ -66,6 +74,28 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes modal-fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-zoom-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 

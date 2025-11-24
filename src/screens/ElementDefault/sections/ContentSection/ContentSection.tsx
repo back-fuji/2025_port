@@ -3,6 +3,7 @@
     GithubIcon,
     LinkedinIcon,
     TwitterIcon,
+    XIcon,
   } from "lucide-react";
   import { useState, FormEvent, useEffect, useRef } from "react";
   import { useLocation } from "react-router-dom";
@@ -170,6 +171,8 @@
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
     const [honeypot, setHoneypot] = useState(""); // ハニーポット（迷惑メール対策）
+    const [selectedProject, setSelectedProject] = useState<typeof projectsData[0] | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
     // タイピングエフェクト用の状態
     const aboutSectionRef = useRef<HTMLDivElement>(null);
@@ -445,6 +448,44 @@
       }
     };
 
+    const openModal = (project: typeof projectsData[0]) => {
+      setSelectedProject(project);
+      setIsModalOpen(true);
+      // モーダル表示時にbodyのスクロールを無効化
+      document.body.style.overflow = "hidden";
+    };
+
+    const closeModal = () => {
+      setIsModalOpen(false);
+      setSelectedProject(null);
+      // モーダル閉じる時にbodyのスクロールを有効化
+      document.body.style.overflow = "unset";
+    };
+
+    // モーダル背景クリックで閉じる
+    const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      if (e.target === e.currentTarget) {
+        closeModal();
+      }
+    };
+
+    // ESCキーでモーダルを閉じる
+    useEffect(() => {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === "Escape" && isModalOpen) {
+          closeModal();
+        }
+      };
+
+      if (isModalOpen) {
+        window.addEventListener("keydown", handleEscape);
+      }
+
+      return () => {
+        window.removeEventListener("keydown", handleEscape);
+      };
+    }, [isModalOpen]);
+
     return (
       <section className="flex flex-col items-center px-8 py-10 w-full">
         <div className="w-full max-w-4xl flex flex-col gap-6">
@@ -453,12 +494,32 @@
             ref={aboutSectionRef}
             className="min-h-[620px] flex flex-col items-center justify-center py-[216px] translate-y-[-1rem] animate-fade-in opacity-0"
           >
-            <h1 className="[font-family:'Noto_Sans_JP',Helvetica] font-black text-white text-7xl text-center tracking-[0.05em] leading-[72px] whitespace-nowrap">
+            <h1 className="[font-family:'Noto_Sans_JP',Helvetica] font-black text-white text-5xl sm:text-7xl text-center tracking-[0.05em] leading-[72px] whitespace-nowrap">
               {nameTyping.displayedText}
             </h1>
   
-            <p className="pt-4 [font-family:'Inter',Helvetica] font-normal text-gray-300 text-xl text-center tracking-[0] leading-7 whitespace-nowrap">
-              {titleTyping.displayedText}
+            <p className="pt-4 [font-family:'Inter',Helvetica] font-normal text-gray-300 text-xl text-center leading-7 md:whitespace-nowrap">
+              {(() => {
+                const text = titleTyping.displayedText;
+                const breakPoint = "Backend Developer";
+                const breakIndex = text.indexOf(breakPoint);
+                
+                // スマホの時だけ「Backend Developer」の前で改行
+                if (breakIndex > 0) {
+                  const beforeBreak = text.substring(0, breakIndex);
+                  const afterBreak = text.substring(breakIndex);
+                  return (
+                    <>
+                      {beforeBreak}
+                      <span className="md:hidden">
+                        <br />
+                      </span>
+                      {afterBreak}
+                    </>
+                  );
+                }
+                return text;
+              })()}
             </p>
   
             <div className="flex items-center gap-4 pt-8">
@@ -497,7 +558,7 @@
               自己紹介
             </h2>
   
-            <div className="flex items-start gap-8">
+            <div className="flex items-center sm:items-start flex-col sm:flex-row gap-8 ">
               <img
                 className="w-32 h-32 rounded-lg object-cover"
                 alt="Profile"
@@ -525,44 +586,47 @@
               スキルセット
             </h2>
   
-            <div className="grid grid-cols-5 gap-4">
-              {skillsData.map((skill, index) => (
-                <Card
-                  key={index}
-                  className="bg-[#1f293780] border-0 rounded-xl hover:bg-[#1f2937a0] transition-colors"
-                >
-                  <CardContent className="flex flex-col items-center p-4 gap-2">
-                    <div
-                      className="w-12 h-12 bg-cover bg-center"
-                      style={{ backgroundImage: `url(${skill.icon})` }}
-                    />
+            <ScrollArea className="w-full">
+              <div className="flex gap-4 pb-4">
+                {skillsData.map((skill, index) => (
+                  <Card
+                    key={index}
+                    className="flex-shrink-0 w-[140px] sm:w-[180px] bg-[#1f293780] border-0 rounded-xl hover:bg-[#1f2937a0] transition-colors"
+                  >
+                    <CardContent className="flex flex-col items-center p-4 gap-2">
+                      <div
+                        className="w-12 h-12 bg-cover bg-center"
+                        style={{ backgroundImage: `url(${skill.icon})` }}
+                      />
   
-                    <p className="[font-family:'Inter',Helvetica] font-normal text-gray-200 text-base tracking-[0] leading-6 text-center">
-                      {skill.name}
-                    </p>
+                      <p className="[font-family:'Inter',Helvetica] font-normal text-gray-200 text-sm sm:text-base tracking-[0] leading-6 text-center">
+                        {skill.name}
+                      </p>
   
-                    <div className="flex items-center gap-0">
-                      {Array.from({ length: 5 }).map((_, starIndex) => (
-                        <div
-                          key={starIndex}
-                          className="w-6 h-[29px] flex items-center justify-center"
-                        >
-                          <img
-                            className="w-5 h-[19px]"
-                            alt="Star"
-                            src={
-                              starIndex < skill.rating
-                                ? "https://c.animaapp.com/micu87i2SXE1a3/img/vector-2.svg"
-                                : "https://c.animaapp.com/micu87i2SXE1a3/img/vector-28.svg"
-                            }
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                      <div className="flex items-center gap-0">
+                        {Array.from({ length: 5 }).map((_, starIndex) => (
+                          <div
+                            key={starIndex}
+                            className="w-6 h-[29px] flex items-center justify-center"
+                          >
+                            <img
+                              className="w-5 h-[19px]"
+                              alt="Star"
+                              src={
+                                starIndex < skill.rating
+                                  ? "https://c.animaapp.com/micu87i2SXE1a3/img/vector-2.svg"
+                                  : "https://c.animaapp.com/micu87i2SXE1a3/img/vector-28.svg"
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </div>
   
           <div className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:600ms]">
@@ -611,7 +675,8 @@
                 {projectsData.map((project, index) => (
                   <Card
                     key={index}
-                    className="flex-shrink-0 w-[424px] bg-[#1f293780] border-0 rounded-xl overflow-hidden shadow-[0px_2px_4px_-2px_#0000001a,0px_4px_6px_-1px_#0000001a] hover:bg-[#1f2937a0] transition-colors"
+                    onClick={() => openModal(project)}
+                    className="flex-shrink-0 w-[260px] sm:w-[424px] bg-[#1f293780] border-0 rounded-xl overflow-hidden shadow-[0px_2px_4px_-2px_#0000001a,0px_4px_6px_-1px_#0000001a] hover:bg-[#1f2937a0] transition-colors cursor-pointer"
                   >
                     <div
                       className="w-full h-48 bg-cover bg-center"
@@ -747,6 +812,54 @@
             </form>
           </div>
         </div>
+
+        {/* プロジェクト詳細モーダル */}
+        {isModalOpen && selectedProject && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-modal-fade-in"
+            onClick={handleBackdropClick}
+          >
+            <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#1a1a1a] rounded-xl shadow-2xl animate-modal-zoom-in">
+              {/* 閉じるボタン */}
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-gray-800 hover:bg-gray-700 rounded-full transition-colors"
+                aria-label="閉じる"
+              >
+                <XIcon className="w-5 h-5 text-white" />
+              </button>
+
+              {/* モーダルコンテンツ */}
+              <div className="flex flex-col">
+                <div
+                  className="w-full h-64 sm:h-80 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${selectedProject.image})` }}
+                />
+                <CardContent className="flex flex-col gap-4 p-6">
+                  <h3 className="[font-family:'Inter',Helvetica] font-bold text-white text-2xl tracking-[0] leading-8">
+                    {selectedProject.title}
+                  </h3>
+
+                  <p className="[font-family:'Noto_Sans_JP',Helvetica] font-light text-gray-300 text-base tracking-[0] leading-6">
+                    {selectedProject.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {selectedProject.tags.map((tag, tagIndex) => (
+                      <Badge
+                        key={tagIndex}
+                        variant="secondary"
+                        className="bg-[#00a8ff33] text-[#00a8ff] hover:bg-[#00a8ff44] px-3 py-1 rounded-full [font-family:'Inter',Helvetica] font-normal text-xs tracking-[0] leading-4"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
     );
   };

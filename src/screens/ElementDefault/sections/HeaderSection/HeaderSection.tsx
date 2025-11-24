@@ -98,7 +98,7 @@ export const HeaderSection = (): JSX.Element => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex w-full items-center justify-center bg-[#101622cc] backdrop-blur-[2px] backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(2px)_brightness(100%)] translate-y-[-1rem] animate-fade-in opacity-0">
-      <div className="flex max-w-screen-lg w-full items-center justify-between pt-4 pb-[17px] px-10 border-b border-gray-800">
+      <div className="flex max-w-screen-lg w-full items-center justify-between pt-4 pb-[17px] border-b border-gray-800 px-4 sm:px-10">
         <Link to="/" className="inline-flex items-center gap-3">
           <div className="flex flex-col w-5 h-5 items-start">
             {/* モダンな幾何学的デザイン - レイヤー/スタック系 */}
@@ -146,7 +146,7 @@ export const HeaderSection = (): JSX.Element => {
           </div>
         </Link>
 
-        <nav className="inline-flex items-center gap-8">
+        <nav className="inline-flex items-center gap-2 sm:gap-8">
           {navItems.map((item, index) => {
             // クリックされた項目または現在のルートが一致する場合は黄色
             const isActiveItem = activeItem === item.label || (item.isRoute && location.pathname === item.href);

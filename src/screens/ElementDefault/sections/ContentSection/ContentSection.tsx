@@ -133,6 +133,15 @@
     // Formspreeのエンドポイント（環境変数から取得）
     const FORMSPREE_ENDPOINT = import.meta.env.VITE_FORMSPREE_ENDPOINT || "";
 
+    // デバッグ用（開発環境のみ）
+    useEffect(() => {
+      if (import.meta.env.DEV) {
+        console.log("Environment variables check:");
+        console.log("VITE_RECAPTCHA_SITE_KEY:", RECAPTCHA_SITE_KEY || "NOT SET");
+        console.log("VITE_FORMSPREE_ENDPOINT:", FORMSPREE_ENDPOINT || "NOT SET");
+      }
+    }, []);
+
     // reCAPTCHA v3のスクリプトを動的に読み込む
     useEffect(() => {
       if (RECAPTCHA_SITE_KEY && !document.querySelector('script[src*="recaptcha"]')) {
@@ -141,6 +150,8 @@
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
+      } else if (!RECAPTCHA_SITE_KEY) {
+        console.warn("reCAPTCHA site key is not set. Please check your .env file and restart the dev server.");
       }
     }, [RECAPTCHA_SITE_KEY]);
 

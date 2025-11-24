@@ -1,0 +1,545 @@
+  import {
+    ChevronDownIcon,
+    GithubIcon,
+    LinkedinIcon,
+    TwitterIcon,
+  } from "lucide-react";
+  import { useState, FormEvent, useEffect } from "react";
+  import { Badge } from "../../../../components/ui/badge";
+  import { Button } from "../../../../components/ui/button";
+  import { Card, CardContent } from "../../../../components/ui/card";
+  import { Input } from "../../../../components/ui/input";
+  import { ScrollArea, ScrollBar } from "../../../../components/ui/scroll-area";
+  import { Textarea } from "../../../../components/ui/textarea";
+  
+  const skillsData = [
+    {
+      name: "React",
+      icon: "https://c.animaapp.com/micu87i2SXE1a3/img/react-icon.png",
+      rating: 5,
+    },
+    {
+      name: "TypeScript",
+      icon: "https://c.animaapp.com/micu87i2SXE1a3/img/typescript-icon.png",
+      rating: 4,
+    },
+    {
+      name: "Tailwind CSS",
+      icon: "https://c.animaapp.com/micu87i2SXE1a3/img/tailwind-css-icon.png",
+      rating: 5,
+    },
+    {
+      name: "Node.js",
+      icon: "https://c.animaapp.com/micu87i2SXE1a3/img/node-js-icon.png",
+      rating: 5,
+    },
+    {
+      name: "AWS",
+      icon: "https://c.animaapp.com/micu87i2SXE1a3/img/aws-icon.png",
+      rating: 5,
+    },
+  ];
+  
+  const projectsData = [
+    {
+      title: "Analytics Dashboard",
+      description: "リアルタイムデータ可視化ダッシュボード。ReactとD3.jsを使用。",
+      image:
+        "https://c.animaapp.com/micu87i2SXE1a3/img/ab6axua7pbzgi0fomz7lrzedwlmhueelqyip-pa7etdvwrex7clcdxwhvplf780c.png",
+      tags: ["React", "Node.js", "D3.js"],
+    },
+    {
+      title: "Task Management App",
+      description: "チーム向けのタスク管理ツール。Next.jsとFirebaseで構築。",
+      image:
+        "https://c.animaapp.com/micu87i2SXE1a3/img/ab6axubovv7fkgfoaystwvnmiu-5sr6wrnvffozxoytc-yf-8jm-nb7y1ogw6e6s.png",
+      tags: ["Next.js", "Firebase", "Tailwind CSS"],
+    },
+    {
+      title: "E-commerce Site",
+      description: "Vue.jsとStripeを統合したモダンなオンラインストア。",
+      image:
+        "https://c.animaapp.com/micu87i2SXE1a3/img/ab6axuawzoju19ztl9wifbxmriy2di9mkh0qj3dqfjfdapragmm-oddg--blpsds.png",
+      tags: ["Vue.js", "Stripe", "GraphQL"],
+    },
+  ];
+  
+  const experienceData = [
+    {
+      title: "シニアフロントエンドエンジニア, Tech Solutions Inc.",
+      period: "2022 - 現在",
+      achievements: [
+        "主要なEコマースプラットフォームのUI/UXをReactとTypeScriptを使用して再設計。",
+        "コンポーネントライブラリを開発し、開発効率を30%向上。",
+        "パフォーマンスチューニングにより、ページの読み込み速度を50%改善。",
+        "ジュニア開発者2名のメンタリングとコードレビューを担当。",
+      ],
+    },
+    {
+      title: "フロントエンドエンジニア, Tech Solutions Inc.",
+      period: "2020 - 2022",
+      achievements: [
+        "Next.jsを用いた新しいマーケティングサイトの構築を主導。",
+        "REST APIと連携し、動的なコンテンツ表示を実現。",
+        "Storybookを導入し、UIコンポーネントのテストと文書化を効率化。",
+      ],
+    },
+    {
+      title: "Webデベロッパー, Creative Agency",
+      period: "2018 - 2020",
+      achievements: [
+        "クライアント向けにWordPressサイトを構築・カスタマイズ。",
+        "HTML, CSS, JavaScriptを使用して、レスポンシブなランディングページを作成。",
+        "PHPによるカスタムWordPressプラグインの開発。",
+      ],
+    },
+  ];
+  
+  // reCAPTCHA v3の型定義
+  declare global {
+    interface Window {
+      grecaptcha: {
+        ready: (callback: () => void) => void;
+        execute: (siteKey: string, options: { action: string }) => Promise<string>;
+      };
+    }
+  }
+
+  interface FormData {
+    name: string;
+    email: string;
+    message: string;
+  }
+
+  interface FormErrors {
+    name?: string;
+    email?: string;
+    message?: string;
+  }
+
+  export const ContentSection = (): JSX.Element => {
+    const [formData, setFormData] = useState<FormData>({
+      name: "",
+      email: "",
+      message: "",
+    });
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+    const [honeypot, setHoneypot] = useState(""); // ハニーポット（迷惑メール対策）
+
+    // reCAPTCHA v3のサイトキー（環境変数から取得、デフォルトは空）
+    const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+    // Formspreeのエンドポイント（環境変数から取得）
+    const FORMSPREE_ENDPOINT = import.meta.env.VITE_FORMSPREE_ENDPOINT || "";
+
+    // reCAPTCHA v3のスクリプトを動的に読み込む
+    useEffect(() => {
+      if (RECAPTCHA_SITE_KEY && !document.querySelector('script[src*="recaptcha"]')) {
+        const script = document.createElement("script");
+        script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    }, [RECAPTCHA_SITE_KEY]);
+
+    const validateForm = (): boolean => {
+      const newErrors: FormErrors = {};
+
+      if (!formData.name.trim()) {
+        newErrors.name = "お名前を入力してください";
+      }
+
+      if (!formData.email.trim()) {
+        newErrors.email = "メールアドレスを入力してください";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = "有効なメールアドレスを入力してください";
+      }
+
+      if (!formData.message.trim()) {
+        newErrors.message = "メッセージを入力してください";
+      } else if (formData.message.trim().length < 10) {
+        newErrors.message = "メッセージは10文字以上で入力してください";
+      }
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      // ハニーポットチェック（ボット対策）
+      if (honeypot) {
+        console.log("Bot detected");
+        return;
+      }
+
+      if (!validateForm()) {
+        return;
+      }
+
+      setIsSubmitting(true);
+      setSubmitStatus("idle");
+
+      try {
+        // reCAPTCHA v3の実行
+        let recaptchaToken = "";
+        if (RECAPTCHA_SITE_KEY && window.grecaptcha) {
+          try {
+            recaptchaToken = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, {
+              action: "submit_contact_form",
+            });
+          } catch (recaptchaError) {
+            console.error("reCAPTCHA error:", recaptchaError);
+            // reCAPTCHAが失敗しても送信は続行（オプショナル）
+          }
+        }
+
+        // Formspreeへの送信
+        const response = await fetch(FORMSPREE_ENDPOINT || "https://formspree.io/f/YOUR_FORM_ID", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            _recaptcha: recaptchaToken, // reCAPTCHAトークンも送信
+          }),
+        });
+
+        if (response.ok) {
+          setSubmitStatus("success");
+          setFormData({ name: "", email: "", message: "" });
+          setErrors({});
+          // 3秒後にステータスをリセット
+          setTimeout(() => setSubmitStatus("idle"), 3000);
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "送信に失敗しました");
+        }
+      } catch (error) {
+        console.error("Form submission error:", error);
+        setSubmitStatus("error");
+        // 5秒後にエラーステータスをリセット
+        setTimeout(() => setSubmitStatus("idle"), 5000);
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+    const handleChange = (
+      field: keyof FormData,
+      value: string
+    ) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+      // エラーをクリア
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
+      }
+    };
+
+    return (
+      <section className="flex flex-col items-center px-8 py-10 w-full">
+        <div className="w-full max-w-4xl flex flex-col gap-6">
+          <div className="min-h-[620px] flex flex-col items-center justify-center py-[216px] translate-y-[-1rem] animate-fade-in opacity-0">
+            <h1 className="[font-family:'Noto_Sans_JP',Helvetica] font-black text-white text-7xl text-center tracking-[-3.60px] leading-[72px] whitespace-nowrap">
+              後藤　正文
+            </h1>
+  
+            <p className="pt-4 [font-family:'Inter',Helvetica] font-normal text-gray-300 text-xl text-center tracking-[0] leading-7 whitespace-nowrap">
+              Frontend Developer & Backend Developer | Markup Engineer
+            </p>
+  
+            <div className="flex items-center gap-4 pt-8">
+              <Button
+                variant="secondary"
+                size="icon"
+                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
+              >
+                <GithubIcon className="w-5 h-5 text-white" />
+              </Button>
+  
+              <Button
+                variant="secondary"
+                size="icon"
+                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
+              >
+                <TwitterIcon className="w-5 h-5 text-white" />
+              </Button>
+  
+              <Button
+                variant="secondary"
+                size="icon"
+                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
+              >
+                <LinkedinIcon className="w-5 h-5 text-white" />
+              </Button>
+            </div>
+  
+            <div className="flex flex-col items-center pt-0 pb-[3px] mt-auto">
+              <ChevronDownIcon className="w-9 h-9 text-gray-400" />
+            </div>
+          </div>
+  
+          <div className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+            <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
+              自己紹介
+            </h2>
+  
+            <div className="flex items-start gap-8">
+              <img
+                className="w-32 h-32 rounded-lg object-cover"
+                alt="Profile"
+                src="https://c.animaapp.com/micu87i2SXE1a3/img/image.png"
+              />
+  
+              <p className="flex-1 [font-family:'Noto_Sans_JP',Helvetica] font-light text-gray-300 text-base tracking-[0] leading-[26px]">
+                2020年に上京しIT業界へ転身しました。
+                <br />
+                Laravelを用いたAPI・管理画面開発、Vue.jsによるSPA構築、デザイン忠実度の高いマークアップに実務経験があります。
+                <br />
+                マーケティング領域と人材ベンチャーでの経験から、目的に合わせた要件整理やクライアント理解に基づく実装、
+                <br />
+                スピード感のある対応を得意としています。
+                <br />
+                趣味はサウナと筋トレで、心身のコンディションをそこで整えてリフレッシュしています。
+                <br />
+                「どうすれば目標を実現できるか」を軸に、手を動かしながら改善を積み重ねるスタイルです。
+              </p>
+            </div>
+          </div>
+  
+          <div className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+            <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
+              スキルセット
+            </h2>
+  
+            <div className="grid grid-cols-5 gap-4">
+              {skillsData.map((skill, index) => (
+                <Card
+                  key={index}
+                  className="bg-[#1f293780] border-0 rounded-xl hover:bg-[#1f2937a0] transition-colors"
+                >
+                  <CardContent className="flex flex-col items-center p-4 gap-2">
+                    <div
+                      className="w-12 h-12 bg-cover bg-center"
+                      style={{ backgroundImage: `url(${skill.icon})` }}
+                    />
+  
+                    <p className="[font-family:'Inter',Helvetica] font-normal text-gray-200 text-base tracking-[0] leading-6 text-center">
+                      {skill.name}
+                    </p>
+  
+                    <div className="flex items-center gap-0">
+                      {Array.from({ length: 5 }).map((_, starIndex) => (
+                        <div
+                          key={starIndex}
+                          className="w-6 h-[29px] flex items-center justify-center"
+                        >
+                          <img
+                            className="w-5 h-[19px]"
+                            alt="Star"
+                            src={
+                              starIndex < skill.rating
+                                ? "https://c.animaapp.com/micu87i2SXE1a3/img/vector-2.svg"
+                                : "https://c.animaapp.com/micu87i2SXE1a3/img/vector-28.svg"
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+  
+          <div className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:600ms]">
+            <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
+              職務経歴
+            </h2>
+  
+            <div className="flex flex-col gap-12 pl-[34px] border-l-2 border-gray-700 relative">
+              {experienceData.map((experience, index) => (
+                <div key={index} className="flex flex-col gap-2 relative">
+                  <div
+                    className="absolute w-3 h-3 bg-[#00a8ff] rounded-full shadow-[0px_0px_0px_4px_#1a1a1a]"
+                    style={{ left: "-39px", top: "0" }}
+                  />
+  
+                  <h3 className="[font-family:'Inter',Helvetica] font-bold text-white text-lg tracking-[0] leading-7">
+                    {experience.title}
+                  </h3>
+  
+                  <p className="[font-family:'Inter',Helvetica] font-normal text-gray-400 text-sm tracking-[0] leading-5">
+                    {experience.period}
+                  </p>
+  
+                  <ul className="flex flex-col gap-1 pl-5 pt-2 list-none">
+                    {experience.achievements.map((achievement, achIndex) => (
+                      <li
+                        key={achIndex}
+                        className="[font-family:'Noto_Sans_JP',Helvetica] font-light text-gray-300 text-base tracking-[0] leading-6"
+                      >
+                        {achievement}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+  
+          <div className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:800ms]">
+            <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
+              プロジェクト
+            </h2>
+  
+            <ScrollArea className="w-full">
+              <div className="flex gap-6 pb-4">
+                {projectsData.map((project, index) => (
+                  <Card
+                    key={index}
+                    className="flex-shrink-0 w-[424px] bg-[#1f293780] border-0 rounded-xl overflow-hidden shadow-[0px_2px_4px_-2px_#0000001a,0px_4px_6px_-1px_#0000001a] hover:bg-[#1f2937a0] transition-colors"
+                  >
+                    <div
+                      className="w-full h-48 bg-cover bg-center"
+                      style={{ backgroundImage: `url(${project.image})` }}
+                    />
+                    <CardContent className="flex flex-col gap-2 p-6">
+                      <h3 className="[font-family:'Inter',Helvetica] font-bold text-white text-lg tracking-[0] leading-7">
+                        {project.title}
+                      </h3>
+  
+                      <p className="[font-family:'Noto_Sans_JP',Helvetica] font-light text-gray-300 text-sm tracking-[0] leading-5">
+                        {project.description}
+                      </p>
+  
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        {project.tags.map((tag, tagIndex) => (
+                          <Badge
+                            key={tagIndex}
+                            variant="secondary"
+                            className="bg-[#00a8ff33] text-[#00a8ff] hover:bg-[#00a8ff44] px-3 py-1 rounded-full [font-family:'Inter',Helvetica] font-normal text-xs tracking-[0] leading-4"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+  
+          <div className="flex flex-col gap-4 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1000ms]">
+            <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
+              お問い合わせ
+            </h2>
+  
+            <p className="[font-family:'Noto_Sans_JP',Helvetica] font-light text-gray-300 text-base tracking-[0] leading-6">
+              お気軽にご連絡ください。プロジェクトのご相談や技術的なディスカッションをお待ちしております。
+            </p>
+  
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-2">
+              {/* ハニーポット（ボット対策 - 人間には見えない） */}
+              <input
+                type="text"
+                name="website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                style={{ position: "absolute", left: "-9999px", opacity: 0, pointerEvents: "none" }}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+              />
+
+              <div className="flex flex-col gap-1">
+                <Input
+                  placeholder="お名前"
+                  value={formData.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  className={`bg-gray-800 border-gray-600 text-gray-300 placeholder:text-gray-500 [font-family:'Noto_Sans_JP',Helvetica] font-light focus-visible:ring-[#00a8ff] ${
+                    errors.name ? "border-red-500" : ""
+                  }`}
+                  disabled={isSubmitting}
+                />
+                {errors.name && (
+                  <p className="text-red-400 text-sm [font-family:'Noto_Sans_JP',Helvetica]">
+                    {errors.name}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <Input
+                  type="email"
+                  placeholder="メールアドレス"
+                  value={formData.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  className={`bg-gray-800 border-gray-600 text-gray-300 placeholder:text-gray-500 [font-family:'Noto_Sans_JP',Helvetica] font-light focus-visible:ring-[#00a8ff] ${
+                    errors.email ? "border-red-500" : ""
+                  }`}
+                  disabled={isSubmitting}
+                />
+                {errors.email && (
+                  <p className="text-red-400 text-sm [font-family:'Noto_Sans_JP',Helvetica]">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <Textarea
+                  placeholder="メッセージ"
+                  value={formData.message}
+                  onChange={(e) => handleChange("message", e.target.value)}
+                  className={`bg-gray-800 border-gray-600 text-gray-300 placeholder:text-gray-500 min-h-[140px] [font-family:'Noto_Sans_JP',Helvetica] font-light focus-visible:ring-[#00a8ff] ${
+                    errors.message ? "border-red-500" : ""
+                  }`}
+                  disabled={isSubmitting}
+                />
+                {errors.message && (
+                  <p className="text-red-400 text-sm [font-family:'Noto_Sans_JP',Helvetica]">
+                    {errors.message}
+                  </p>
+                )}
+              </div>
+
+              {submitStatus === "success" && (
+                <div className="p-4 bg-green-900/30 border border-green-500 rounded-md">
+                  <p className="text-green-400 text-sm [font-family:'Noto_Sans_JP',Helvetica]">
+                    送信が完了しました。ありがとうございます！
+                  </p>
+                </div>
+              )}
+
+              {submitStatus === "error" && (
+                <div className="p-4 bg-red-900/30 border border-red-500 rounded-md">
+                  <p className="text-red-400 text-sm [font-family:'Noto_Sans_JP',Helvetica]">
+                    送信に失敗しました。しばらくしてから再度お試しください。
+                  </p>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full max-w-[480px] h-12 bg-[#00a8ff] hover:bg-[#0096e6] text-white [font-family:'Noto_Sans_JP',Helvetica] font-bold text-base tracking-[0.24px] leading-6 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "送信中..." : "送信する"}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </section>
+    );
+  };
+  

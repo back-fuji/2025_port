@@ -1,5 +1,4 @@
   import {
-    ChevronDownIcon,
     GithubIcon,
     LinkedinIcon,
     TwitterIcon,
@@ -13,204 +12,13 @@
   import { Input } from "../../../../components/ui/input";
   import { ScrollArea, ScrollBar } from "../../../../components/ui/scroll-area";
   import { Textarea } from "../../../../components/ui/textarea";
+  import {
+    experienceData,
+    projectsData,
+    skillIconMap,
+    skillsData,
+  } from "../../../../data/portfolio";
   
-  // Material Symbolsアイコンマッピング
-  const skillIconMap: Record<string, string> = {
-    html5: "code",
-    css3: "style",
-    laravel: "settings_applications",
-    filament: "dashboard_customize",
-    livewire: "bolt",
-    vue_js: "view_module",
-    jquery: "code_blocks",
-    php: "terminal",
-    inertia: "sync_alt",
-    alpine: "flash_on",
-    wordpress: "article",
-    tailwind: "palette",
-    firebase: "local_fire_department",
-    javascript: "code",
-    hubspot: "hub",
-    google_api: "api",
-    github: "account_tree",
-    gitlab: "storage",
-    stripe: "payments",
-    amazon_chime: "videocam",
-    react: "web",
-    nextjs: "arrow_forward",
-  };
-
-  const skillsData = [
-    // 星5（先頭に配置）
-    {
-      name: "HTML5",
-      iconKey: "html5",
-      rating: 5,
-    },
-    {
-      name: "CSS3",
-      iconKey: "css3",
-      rating: 5,
-    },
-    {
-      name: "Laravel",
-      iconKey: "laravel",
-      rating: 5,
-    },
-    {
-      name: "Filament",
-      iconKey: "filament",
-      rating: 5,
-    },
-    {
-      name: "Livewire",
-      iconKey: "livewire",
-      rating: 5,
-    },
-    {
-      name: "Vue.js",
-      iconKey: "vue_js",
-      rating: 5,
-    },
-    {
-      name: "jQuery",
-      iconKey: "jquery",
-      rating: 5,
-    },
-    {
-      name: "PHP",
-      iconKey: "php",
-      rating: 5,
-    },
-    // 星4
-    {
-      name: "Inertia",
-      iconKey: "inertia",
-      rating: 4,
-    },
-    {
-      name: "Alpine.js",
-      iconKey: "alpine",
-      rating: 4,
-    },
-    {
-      name: "WordPress",
-      iconKey: "wordpress",
-      rating: 4,
-    },
-    {
-      name: "GitHub",
-      iconKey: "github",
-      rating: 4,
-    },
-    {
-      name: "GitLab",
-      iconKey: "gitlab",
-      rating: 4,
-    },
-    {
-      name: "Stripe",
-      iconKey: "stripe",
-      rating: 4,
-    },
-    // 星3
-    {
-      name: "Tailwind CSS",
-      iconKey: "tailwind",
-      rating: 3,
-    },
-    {
-      name: "Firebase",
-      iconKey: "firebase",
-      rating: 3,
-    },
-    {
-      name: "JavaScript",
-      iconKey: "javascript",
-      rating: 3,
-    },
-    {
-      name: "HubSpot API",
-      iconKey: "hubspot",
-      rating: 3,
-    },
-    {
-      name: "Google API",
-      iconKey: "google_api",
-      rating: 3,
-    },
-    // 星2
-    {
-      name: "React.js",
-      iconKey: "react",
-      rating: 2,
-    },
-    {
-      name: "Next.js",
-      iconKey: "nextjs",
-      rating: 2,
-    },
-    {
-      name: "Amazon Chime",
-      iconKey: "amazon_chime",
-      rating: 2,
-    },
-  ];
-  
-  const projectsData = [
-    {
-      title: "Analytics Dashboard",
-      description: "リアルタイムデータ可視化ダッシュボード。ReactとD3.jsを使用。",
-      image:
-        "https://c.animaapp.com/micu87i2SXE1a3/img/ab6axua7pbzgi0fomz7lrzedwlmhueelqyip-pa7etdvwrex7clcdxwhvplf780c.png",
-      tags: ["React", "Node.js", "D3.js"],
-    },
-    {
-      title: "Task Management App",
-      description: "チーム向けのタスク管理ツール。Next.jsとFirebaseで構築。",
-      image:
-        "https://c.animaapp.com/micu87i2SXE1a3/img/ab6axubovv7fkgfoaystwvnmiu-5sr6wrnvffozxoytc-yf-8jm-nb7y1ogw6e6s.png",
-      tags: ["Next.js", "Firebase", "Tailwind CSS"],
-    },
-    {
-      title: "E-commerce Site",
-      description: "Vue.jsとStripeを統合したモダンなオンラインストア。",
-      image:
-        "https://c.animaapp.com/micu87i2SXE1a3/img/ab6axuawzoju19ztl9wifbxmriy2di9mkh0qj3dqfjfdapragmm-oddg--blpsds.png",
-      tags: ["Vue.js", "Stripe", "GraphQL"],
-    },
-  ];
-  
-  const experienceData = [
-    {
-      title: "シニアフロントエンドエンジニア, Tech Solutions Inc.",
-      period: "2022 - 現在",
-      achievements: [
-        "主要なEコマースプラットフォームのUI/UXをReactとTypeScriptを使用して再設計。",
-        "コンポーネントライブラリを開発し、開発効率を30%向上。",
-        "パフォーマンスチューニングにより、ページの読み込み速度を50%改善。",
-        "ジュニア開発者2名のメンタリングとコードレビューを担当。",
-      ],
-    },
-    {
-      title: "フロントエンドエンジニア, Tech Solutions Inc.",
-      period: "2020 - 2022",
-      achievements: [
-        "Next.jsを用いた新しいマーケティングサイトの構築を主導。",
-        "REST APIと連携し、動的なコンテンツ表示を実現。",
-        "Storybookを導入し、UIコンポーネントのテストと文書化を効率化。",
-      ],
-    },
-    {
-      title: "Webデベロッパー, Creative Agency",
-      period: "2018 - 2020",
-      achievements: [
-        "クライアント向けにWordPressサイトを構築・カスタマイズ。",
-        "HTML, CSS, JavaScriptを使用して、レスポンシブなランディングページを作成。",
-        "PHPによるカスタムWordPressプラグインの開発。",
-      ],
-    },
-  ];
   
   // reCAPTCHA v3の型定義
   declare global {
@@ -293,7 +101,7 @@
     const aboutSectionRef = useRef<HTMLDivElement>(null);
     const hasAnimatedRef = useRef(false);
     const nameText = "後藤　正文";
-    const titleText = "Frontend Developer & Backend Developer | Markup Engineer";
+    const titleText = "Frontend Developer | Backend Developer | Markup Engineer";
     const nameTyping = useTypingEffect(nameText, 80);
     const titleTyping = useTypingEffect(titleText, 30);
 
@@ -602,84 +410,23 @@
     }, [isModalOpen]);
 
     return (
-      <section className="flex flex-col items-center px-8 py-10 w-full">
-        <div className="w-full max-w-4xl flex flex-col gap-6">
-          <div 
-            id="about" 
-            ref={aboutSectionRef}
-            className="min-h-[620px] flex flex-col items-center justify-center py-[216px] translate-y-[-1rem] animate-fade-in opacity-0"
+      <section className="flex flex-col items-center px-8 py-16 w-full">
+        <div className="w-full max-w-4xl flex flex-col gap-10 sm:gap-14">
+          <div
+            id="about"
+            className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]"
           >
-            <h1 className="[font-family:'Noto_Sans_JP',Helvetica] font-black text-white text-5xl sm:text-7xl text-center tracking-[0.05em] leading-[72px] whitespace-nowrap">
-              {nameTyping.displayedText}
-            </h1>
-  
-            <p className="pt-4 [font-family:'Inter',Helvetica] font-normal text-gray-300 text-xl text-center leading-7 md:whitespace-nowrap">
-              {(() => {
-                const text = titleTyping.displayedText;
-                const breakPoint = "Backend Developer";
-                const breakIndex = text.indexOf(breakPoint);
-                
-                // スマホの時だけ「Backend Developer」の前で改行
-                if (breakIndex > 0) {
-                  const beforeBreak = text.substring(0, breakIndex);
-                  const afterBreak = text.substring(breakIndex);
-                  return (
-                    <>
-                      {beforeBreak}
-                      <span className="md:hidden">
-                        <br />
-                      </span>
-                      {afterBreak}
-                    </>
-                  );
-                }
-                return text;
-              })()}
-            </p>
-  
-            <div className="flex items-center gap-4 pt-8">
-              <Button
-                variant="secondary"
-                size="icon"
-                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
-              >
-                <GithubIcon className="w-5 h-5 text-white" />
-              </Button>
-  
-              <Button
-                variant="secondary"
-                size="icon"
-                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
-              >
-                <TwitterIcon className="w-5 h-5 text-white" />
-              </Button>
-  
-              <Button
-                variant="secondary"
-                size="icon"
-                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
-              >
-                <LinkedinIcon className="w-5 h-5 text-white" />
-              </Button>
-            </div>
-  
-            <div className="flex flex-col items-center pt-0 pb-[3px] mt-auto">
-              <ChevronDownIcon className="w-9 h-9 text-gray-400" />
-            </div>
-          </div>
-  
-          <div  className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
-            <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
+            <h2 className=" [font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
               自己紹介
             </h2>
-  
+
             <div className="flex items-center sm:items-start flex-col sm:flex-row gap-8 ">
               <img
                 className="w-32 h-32 rounded-lg object-cover"
                 alt="Profile"
                 src="https://c.animaapp.com/micu87i2SXE1a3/img/image.png"
               />
-  
+
               <p className="flex-1 [font-family:'Noto_Sans_JP',Helvetica] font-light text-gray-300 text-base tracking-[0] leading-[26px]">
                 2020年に上京しIT業界へ転身しました。
                 <br />
@@ -695,10 +442,10 @@
               </p>
             </div>
           </div>
-  
+
           <div className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
             <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
-              スキルセット
+              スキルセット <span className="text-sm font-normal text-gray-300">（2026年1月現在）</span>
             </h2>
   
             <ScrollArea className="w-full">
@@ -739,7 +486,10 @@
             </ScrollArea>
           </div>
   
-          <div className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:600ms]">
+          <div
+            id="experience"
+            className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:600ms]"
+          >
             <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
               職務経歴
             </h2>
@@ -777,7 +527,7 @@
   
           <div id="works" className="flex flex-col gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:800ms]">
             <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
-              プロジェクト
+              プロジェクト <span className="text-sm font-normal text-gray-300">（2026年1月現在）</span>
             </h2>
   
             <ScrollArea className="w-full">
@@ -819,6 +569,38 @@
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
           </div>
+
+          <div
+            ref={aboutSectionRef}
+            className="min-h-[300px] flex flex-col items-center justify-center translate-y-[-1rem] animate-fade-in opacity-0"
+          >
+            <div className="flex items-center gap-4 pt-8">
+              <Button
+                variant="secondary"
+                size="icon"
+                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
+              >
+                <GithubIcon className="w-5 h-5 text-white" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="icon"
+                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
+              >
+                <TwitterIcon className="w-5 h-5 text-white" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="icon"
+                className="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-lg"
+              >
+                <LinkedinIcon className="w-5 h-5 text-white" />
+              </Button>
+            </div>
+
+          </div>
   
           <div id="contact" className="flex flex-col gap-4 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1000ms]">
             <h2 className="[font-family:'Noto_Sans_JP',Helvetica] font-bold text-white text-[22px] tracking-[-0.33px] leading-[27.5px]">
@@ -828,7 +610,7 @@
             <p className="[font-family:'Noto_Sans_JP',Helvetica] font-light text-gray-300 text-base tracking-[0] leading-6">
               お仕事のご相談、その他後質問なんでもお気軽にご連絡ください。
               <br />
-              （このフォームはFormspreeを使用して実装されているため送信できます。）
+              （このフォームはFormspreeを使用して実装されており送信可能です。）
             </p>
   
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-2">
